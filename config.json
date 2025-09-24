@@ -1,0 +1,107 @@
+{
+    "name": "Rudra Funds Algo",
+    "version": "v10_0906",
+    "kite": {
+        "login_url": "https://kite.zerodha.com/connect/login?api_key=",
+        "api_key": "",
+        "api_secret": "",
+        "refresh_token": "",
+        "access_token": "",
+        "last_update_time": "01-07-2025 09:48:08"
+    },
+    "system": {
+        "termux": false,
+        "verbose": false,
+        "virtual_env": true,
+        "selling": true,
+        "nifty_token": 256265,
+        "market_open_time_hh": 9,
+        "market_open_time_mm": 15,
+        "start_trading_time_hh": 9,
+        "start_trading_time_mm": 40,
+        "market_close_time_hh": 15,
+        "market_close_time_mm": 30,
+        "cutoff_time_hh": 15,
+        "cutoff_time_mm": 0,
+        "telegram": {
+            "enabled": false,
+            "bot_token": "",
+            "bot_chat_id": "",
+            "bot_chat_id_dev": ""
+        },
+        "only_progress_status": true
+    },
+    "rules": {
+        "goal": {
+            "short": 1000000,
+            "long": 10000000,
+            "decade": 100000000
+        },
+        "position": {
+            "nifty_option_premium": 125,
+            "nifty_option_premium_mask": 15,
+            "nifty_option_margin": 600,
+            "cutoff_time_hh": 14,
+            "cutoff_time_mm": 30
+        },
+        "risk": {
+            "lot_size": 525,
+            "profit_lock_lot_size": 300,
+            "stop_loss": 10,
+            "target": 20,
+            "trailing_threshold": 5,
+            "loss_threshold": -15750,
+            "profit_threshold": 15750,
+            "profit_lock_max_sl_hits": 2,
+            "sl_buffer": 0,
+            "lock_buffer": 1,
+            "sl_trailing_enable": true,
+            "besl_trailing": 5,
+            "order_buy_depth": 0
+        },
+        "cooldown_time": {
+            "stop_loss": 4,
+            "target": 4,
+            "breakeven": 4
+        }
+    },
+    "persistent": {
+        "report": {
+            "enabled": true,
+            "last_update_time": "01-07-2025 15:00:01",
+            "opening_funds": 0.0,
+            "today_pnl": 0.0,
+            "today_change": 0.0,
+            "positions": {
+                "total": 2,
+                "win_percent": 0.0,
+                "target": 0,
+                "break_even": 0,
+                "stop_loss": 1,
+                "CE": 1,
+                "PE": 1
+            }
+        }
+    },
+    "nse_holidays": [
+        "2025-01-26",
+        "2025-02-26",
+        "2025-03-14",
+        "2025-03-31",
+        "2025-04-10",
+        "2025-04-14",
+        "2025-04-18",
+        "2025-05-01",
+        "2025-08-15",
+        "2025-08-27",
+        "2025-10-02",
+        "2025-10-21",
+        "2025-10-22",
+        "2025-11-05",
+        "2025-12-25"
+    ],
+    "backtest": {
+        "start_date": "2025-02-03",
+        "end_date": "2025-2-25"
+    }
+}
