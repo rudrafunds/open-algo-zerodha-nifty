@@ -1,4 +1,4 @@
-# OpenAlgo
+# OpenAlgoConnect
  An open source algorithmic trading platform for Nifty F&amp;O - Buying &amp; Selling, leveraging candlestick/chart patterns, pivot analysis, and real-time risk management. It integrates with Zerodha Kite Connect for execution.
 
  This design ensures that the trading system is efficient, adaptable, and reliable, providing a robust framework for automated options trading on the Nifty index.
