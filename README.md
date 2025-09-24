@@ -3,16 +3,17 @@
 
  This design ensures that the trading system is efficient, adaptable, and reliable, providing a robust framework for automated options trading on the Nifty index.
 
-### **1.2 Key Features**
+### **1.1 Key Features**
 - 50+ candlestick/chart pattern detection
 - Config-driven risk management
 - Virtual trading environment
 - Multi-timeframe trend analysis
 - Automated position management
 - Real-time Telegram notifications
+- Resumes function to start from where it left
 
 ---
-## How to Run System?
+### **1.2 How to Run System?**
 - Install and setup python dependencies
 - Config.json - Update Zerodha Connect API Key and Secret obtain from Zerodha Connect API platform
 - Config.json - Check and update your risk management rules like position and rules sections
@@ -21,6 +22,15 @@
 - ./init.sh - to start
 - That's it you can see automatically system does analyze live data and take trades Nifty F&O buying or selling automatically and manages to be in profitable in most controled manner.
 ---
+
+### **1.3 System Live in running**
+![System Live](system_live.jpg)
+
+### **1.3 Telegram Live reporting**
+![Telegram Live](telegram_live.png)
+
+### **1.4 System results so far**
+![System Results](slide_profitability.png)
 
 ## **2. Architecture**
 ### **2.1 System Sequence Diagram
@@ -142,35 +152,6 @@ The system is designed to handle real-time data, manage positions, execute trade
    - **exit_system**: Ensures proper closure of positions and resources on system exit.
    - **signal_handler**: Handles system signals for graceful shutdown.
 
-### Flow of Operations
-
-1. **Initialization**
-   - The system starts by loading the configuration and initializing the Kite Connect API.
-   - It sets up the logging system and configures the WebSocket manager for real-time data.
-
-2. **Data Fetching and Preparation**
-   - Historical OHLC data is fetched to backfill any missing data.
-   - Daily levels and pivot points are calculated based on the previous day's data.
-
-3. **Real-Time Data Handling**
-   - The WebSocket manager subscribes to real-time market data for the Nifty index.
-   - The system maintains 5-minute OHLC data and calculates EMAs for technical analysis.
-
-4. **Trade Execution**
-   - The system continuously monitors the market for entry conditions based on technical indicators and patterns.
-   - When entry conditions are met, a trade is executed, and the position is managed in real-time.
-
-5. **Position Management**
-   - Open positions are managed with dynamic stop-loss, target, and trailing stop-loss mechanisms.
-   - The system implements risk management rules to control lot sizes and manage profit/loss thresholds.
-
-6. **Logging and Notifications**
-   - Real-time updates and notifications are sent to the terminal and via Telegram.
-   - The system logs all significant events and errors for debugging and analysis.
-
-7. **Graceful Shutdown**
-   - The system ensures proper closure of positions and resources on exit, handling system signals and exceptions gracefully.
-
 ### Efficiency and Benefits
 
 - **Real-Time Data Handling**: Ensures up-to-date market information for accurate decision-making.
@@ -258,14 +239,6 @@ graph TB
 }
 ```
 
-### **3.2 Critical Parameters**
-| Parameter               | Purpose                                | Default   | Validation Rule              |
-|-------------------------|----------------------------------------|-----------|------------------------------|
-| `nifty_token`           | Underlying instrument ID               | 256265    | Valid Kite instrument token   |
-| `risk.lot_size`         | Base trading quantity                  | 300       | 1-5000                       |
-| `telegram.bot_token`    | Secure notification channel            | -         | Encrypted storage            |
-| `virtual_env`           | Paper trading mode                     | true      | Boolean enforcement          |
-
 ---
 
 ## **4. Pattern Detection Engine (`rf_patterns.py`)**
@@ -275,26 +248,6 @@ graph TB
 | **Single Candle**   | Hammer, Morning Doji                  | Shooting Star, Gravestone Doji      |
 | **Multi-Candle**    | Three Soldiers, Bullish Engulfing     | Three Crows, Bearish Harami         |
 | **Confirmation**    | Tweezer Bottom, Piercing Line         | Tweezer Top, Dark Cloud Cover       |
-
-**Detection Logic**:
-```python
-def detect_candle_patterns(df):
-    patterns = []
-    latest = df.iloc[-1]
-    
-    # Body/Wick Calculations
-    body = abs(latest['close'] - latest['open'])
-    upper_wick = latest['high'] - max(latest['close'], latest['open'])
-    lower_wick = min(latest['close'], latest['open']) - latest['low']
-    
-    # Hammer Detection
-    if (lower_wick >= 2 * body and 
-        body > 0 and 
-        latest['close'] > latest['open']):
-        patterns.append('hammer')
-    
-    return patterns
-```
 
 ### **4.2 Chart Patterns**
 | Pattern Type       | Detection Method                      | Confirmation Criteria               |
@@ -307,65 +260,41 @@ def detect_candle_patterns(df):
 
 ## **5. Risk Management Framework**
 ### **5.1 Multi-Layer Protection**
-1. **Initial Protection**  
-   ```json
-   "stop_loss": 10
-   ```
-   
-2. **Profit Protection**  
-   ```python
-   if profit >= 50%_target:
-       activate_breakeven()
-       reduce_position_size()
-   ```
+# Algorithm controlled risk and position management
 
-3. **Circuit Breakers**  
-   ```python
-   if daily_loss <= -9000:
-       system_shutdown("Loss threshold breached")
-   ```
-
-### **5.2 Position Sizing Logic**
 ```mermaid
-graph TD
-    A[Pattern Strength] --> B{Size Multiplier}
-    B -->|Strong| C[1.5x Base Lot]
-    B -->|Medium| D[1.0x Base Lot]
-    B -->|Weak| E[0.5x Base Lot]
-    C --> F[Execute Trade]
-```
+graph TD;
+    A(["🏁 Start"]) -->|Check Price| B{{"🔴 Price >= SL?"}}
+    B -->|Yes| C(["❌ Exit Position: SL Hit"])
+    C --> D(["⬆️ Update SL Counter"])
+    D -->|SL Consecutive Hits Max?| E{{"❌ Exit System"}}
 
----
-
-## **6. Execution Workflow**
-### **6.1 Sequence Diagram**
-```mermaid
-sequenceDiagram
-    participant M as Market Data
-    participant S as RF System
-    participant K as Kite Connect
+    B -->|No| F{{"🟡 Price <= 50% Target?"}}
+    F -->|Yes| G(["✅ Set BESL = Entry Price"])
     
-    M->>S: Tick Data (OHLCV)
-    S->>S: detect_patterns()
-    S->>S: calculate_risk()
-    alt Pattern Confirmed
-        S->>K: Place Order (LIMIT)
-        K-->>S: Order Confirmation
-        S->>Telegram: Send Alert
-    else No Signal
-        S->>S: Wait Next Tick
-    end
-```
+    F -->|No| H{{"🟢 Price <= Target?"}}
+    H -->|Yes| I(["✅ Set TSL = Target + Trailing Threshold"])
+    I --> J(["🔄 Adjust Target = Target - Config Target"])
+    
+    H -->|No| K{{"🟠 Price <= TSL & 50% of New Target?"}}
+    K -->|Yes| L(["🔽 Move TSL Down"])
+    
+    K -->|No| M{{"🔵 Price >= TSL?"}}
+    M -->|Yes| N(["🚀 Exit Position: TSL Hit"])
+    
+    M -->|No| O{{"⚪ Price >= BESL?"}}
+    O -->|Yes| P(["🚀 Exit Position: BreakEven Hit"])
 
-### **6.2 Order State Machine**
+    O --> Q{{"🟢 Profit Threshold Reached?"}}
+    Q -->|Yes| R(["🔒 Activate Profit Lock"])
+    
+    Q -->|No| S{{"🔴 Loss Threshold Reached?"}}
+    S -->|Yes| T(["❌ Exit System"])
+    
+    P --> U(["📈 Continue Trading"])
+    R --> U
+    T --> X(["🛑 System Stops"])
 ```
-[IDLE] --> [PATTERN_DETECTED] 
-[PATTERN_DETECTED] --> [RISK_VALIDATED]
-[RISK_VALIDATED] --> [ORDER_PLACED]
-[ORDER_PLACED] --> [FILLED] --> [ACTIVE_MGMT]
-[ORDER_PLACED] --> [REJECTED] --> [ERROR_HANDLING]
-```
-
 ---
 
 ## **7. Monitoring & Reporting**
@@ -388,17 +317,7 @@ Current P&L: +2,150 (1.6%)
 ---
 
 ## **8. Security Architecture**
-### **8.1 Data Protection**
-```python
-# Configuration Encryption Flow
-Fernet(key).encrypt(config_str)  
-           ↓
-AWS Parameter Store (SSM)  
-           ↓
-Runtime Decryption
-```
-
-### **8.2 Access Control**
+### **8.1 Access Control**
 | Resource             | Permission Level       | Authentication Method     |
 |----------------------|------------------------|---------------------------|
 | Kite API             | Trade+Data             | OAuth 2.0 + IP Whitelist  |
