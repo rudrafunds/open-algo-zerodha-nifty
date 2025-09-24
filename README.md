@@ -14,12 +14,12 @@
 
 ---
 ### **1.2 How to Run System?**
-- Install and setup python dependencies
-- Config.json - Update Zerodha Connect API Key and Secret obtain from Zerodha Connect API platform
-- Config.json - Check and update your risk management rules like position and rules sections
-- Config.json - selling to true for selling or false for buying
-- Config.json - virtual_env to false in live or true in virtual running
-- ./init.sh - to start
+- Required: Linux, Python Environment and Kite Connect API access
+ 1. Config.json - Update Zerodha Connect API Key and Secret obtain from Zerodha Connect API platform
+ 2. Config.json - Check and update your risk management rules like position and rules sections
+ 3. Config.json - selling to true for selling or false for buying
+ 4. Config.json - virtual_env to false in live or true in virtual running
+ 5 ./init.sh - to start trading!
 - That's it you can see automatically system does analyze live data and take trades Nifty F&O buying or selling automatically and manages to be in profitable in most controled manner.
 ---
 
