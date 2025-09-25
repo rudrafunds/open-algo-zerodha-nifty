@@ -25,6 +25,7 @@
 ---
 
 ### **1.3 System Live in running**
+![System Live Latest](system_live_latest.jpg)
 ![System Live](system_live.jpg)
 
 ### **1.3 Telegram Live reporting**
