@@ -6,8 +6,9 @@
 ### **1.1 Key Features**
 - 50+ candlestick/chart pattern detection
 - Config-driven risk management
+- No indicators, pure price action, pivots and candle/chart patterns based
+- For now, 5minute timeframe it uses
 - Virtual trading environment
-- Multi-timeframe trend analysis
 - Automated position management
 - Real-time Telegram notifications
 - Resumes function to start from where it left
